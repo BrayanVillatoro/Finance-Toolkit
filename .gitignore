@@ -1,0 +1,8 @@
+# Personal backups exported from the app
+finance-toolkit-backup-*.json
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/

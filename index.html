@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Finance Toolkit</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <h1>Finance Toolkit</h1>
+      <p>Personal calculators that run locally. Your numbers never leave this browser.</p>
+    </div>
+    <button id="theme-toggle" class="btn" type="button">Light / dark</button>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Calculators">
+    <button class="tab" role="tab" data-tab="overview">Overview</button>
+    <button class="tab" role="tab" data-tab="salary">Salary &amp; taxes</button>
+    <button class="tab" role="tab" data-tab="budget">Budget</button>
+    <button class="tab" role="tab" data-tab="networth">Net worth</button>
+    <button class="tab" role="tab" data-tab="investment">Investment</button>
+    <button class="tab" role="tab" data-tab="retirement">Roth IRA &amp; retirement</button>
+    <button class="tab" role="tab" data-tab="mortgage">Mortgage</button>
+    <button class="tab" role="tab" data-tab="auto">Auto loan</button>
+  </nav>
+
+  <main>
+    <!-- ============ OVERVIEW ============ -->
+    <section id="overview" class="calc wide" role="tabpanel">
+      <div class="results">
+        <p class="hint">Combines the numbers from every tab. Income and expenses come from Budget; the mortgage and auto loan count as your loans unless you mark them "Paid off" or "Just exploring" on their tabs.</p>
+        <div class="tiles" id="ov-tiles"></div>
+        <div class="panel">
+          <div class="panel-head"><h3>How you're doing</h3><span class="score" id="ov-score"></span></div>
+          <ul class="ov-checks" id="ov-checks"></ul>
+        </div>
+        <div class="panel">
+          <h3 id="ov-chart-title">Savings vs. loans until retirement</h3>
+          <p class="hint" id="ov-chart-hint"></p>
+          <div class="chart" id="ov-chart"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SALARY & TAXES ============ -->
+    <section id="salary" class="calc" role="tabpanel">
+      <form class="panel inputs" onsubmit="return false">
+        <h2>Salary &amp; taxes</h2>
+        <label class="field">Yearly salary
+          <div class="input"><span class="pre">$</span><input id="sal-income" type="number" min="0" step="1000"></div>
+        </label>
+        <div class="row2">
+          <label class="field">Filing status
+            <div class="input">
+              <select id="sal-status">
+                <option value="single">Single</option>
+                <option value="married" selected>Married (joint)</option>
+                <option value="hoh">Head of household</option>
+              </select>
+            </div>
+          </label>
+          <label class="field">Paid
+            <div class="input">
+              <select id="sal-pay">
+                <option value="week">Every week</option>
+                <option value="biweekly" selected>Every 2 weeks</option>
+                <option value="semimonthly">Twice a month</option>
+                <option value="month">Monthly</option>
+              </select>
+            </div>
+          </label>
+        </div>
+        <div class="row2">
+          <label class="field">401(k) / yr
+            <div class="input"><span class="pre">$</span><input id="sal-401k" type="number" min="0" step="500"></div>
+          </label>
+          <label class="field">Health &amp; HSA / yr
+            <div class="input"><span class="pre">$</span><input id="sal-health" type="number" min="0" step="100"></div>
+          </label>
+        </div>
+        <p class="hint">Pre-tax amounts taken out of your paycheck. Traditional 401(k) lowers income tax only; health premiums and HSA also skip Social Security and Medicare.</p>
+        <label class="field">State income tax
+          <div class="input"><input id="sal-state" type="number" min="0" max="15" step="0.1" value="5"><span class="suf">%</span></div>
+          <span class="hint">A flat estimate. Use 0% in states with no wage income tax (e.g. TX, FL, WA, NV, TN); most others are roughly 3–6%.</span>
+        </label>
+        <div class="note" id="sal-note"></div>
+        <button type="button" class="btn primary" id="sal-to-budget">Use this in my Budget</button>
+        <button type="button" class="btn" data-reset="salary income-streams">Reset to defaults</button>
+      </form>
+      <div class="results">
+        <div class="tiles" id="sal-tiles"></div>
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Other income</h3>
+            <button type="button" class="btn primary" id="sal-add-stream">+ Add income</button>
+          </div>
+          <div id="sal-streams" class="exp-list"></div>
+          <div class="exp-empty" id="sal-streams-empty">No other income. Add a side gig, second job, rental income or anything else that pays you. It also shows on the Budget tab.</div>
+        </div>
+        <div class="two-col">
+          <div class="panel"><h3>Where your income goes</h3><div class="chart" id="sal-donut"></div></div>
+          <div class="panel"><h3>Take-home and taxes at other salaries</h3><div class="chart" id="sal-curve"></div></div>
+        </div>
+        <div class="panel">
+          <h3>Federal income tax by bracket</h3>
+          <p class="hint" id="sal-taxable"></p>
+          <div class="table-wrap" id="sal-table"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ NET WORTH ============ -->
+    <section id="networth" class="calc wide" role="tabpanel">
+      <div class="results">
+        <p class="hint">Your home, car, investment and retirement balances and loans come from their own tabs automatically (mark a mortgage or car loan "Paid off" or "Just exploring" on its tab). Add everything else here, like cash, other vehicles, or credit card and student loan balances.</p>
+        <div class="tiles" id="nw-tiles"></div>
+        <div class="two-col">
+          <div class="panel">
+            <div class="panel-head"><h3>What you own</h3><button type="button" class="btn primary" id="nw-add-asset">+ Add</button></div>
+            <div class="nw-list" id="nw-assets-linked"></div>
+            <div class="nw-list" id="nw-assets"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>What you owe</h3><button type="button" class="btn primary" id="nw-add-debt">+ Add</button></div>
+            <div class="nw-list" id="nw-debts-linked"></div>
+            <div class="nw-list" id="nw-debts"></div>
+            <div class="exp-empty" id="nw-debts-empty">No debts. Add credit cards, student loans or anything else you owe.</div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="panel"><h3>What you own</h3><div class="chart" id="nw-own-chart"></div></div>
+          <div class="panel"><h3>What you owe</h3><div class="chart" id="nw-owe-chart"></div></div>
+        </div>
+        <div><button type="button" class="btn" data-reset="networth-assets networth-debts">Reset to defaults</button></div>
+      </div>
+    </section>
+
+    <!-- ============ INVESTMENT ============ -->
+    <section id="investment" class="calc" role="tabpanel">
+      <form class="panel inputs" onsubmit="return false">
+        <h2>Investment growth</h2>
+        <label class="field">Starting amount
+          <div class="input"><span class="pre">$</span><input id="inv-initial" type="number" min="0" step="100"></div>
+        </label>
+        <label class="field">Contribution
+          <div class="input">
+            <span class="pre">$</span><input id="inv-monthly" type="number" min="0" step="25">
+            <select id="inv-frequency" aria-label="Contribution frequency">
+              <option value="week">per week</option>
+              <option value="biweekly">every 2 weeks</option>
+              <option value="month" selected>per month</option>
+              <option value="year">per year</option>
+            </select>
+          </div>
+          <span class="hint" id="inv-freq-hint"></span>
+        </label>
+        <div class="row2">
+          <label class="field">Annual return
+            <div class="input"><input id="inv-rate" type="number" step="0.1" value="7"><span class="suf">%</span></div>
+          </label>
+          <label class="field">Annual fees
+            <div class="input"><input id="inv-fee" type="number" min="0" step="0.05" value="0"><span class="suf">%</span></div>
+          </label>
+        </div>
+        <div class="row2">
+          <label class="field">Years
+            <div class="input"><input id="inv-years" type="number" min="1" max="80" step="1" value="25"></div>
+          </label>
+          <label class="field">Inflation
+            <div class="input"><input id="inv-inflation" type="number" min="0" step="0.1" value="3"><span class="suf">%</span></div>
+          </label>
+        </div>
+        <label class="field">Raise contribution yearly
+          <div class="input"><input id="inv-increase" type="number" min="0" step="0.5" value="0"><span class="suf">%</span></div>
+        </label>
+        <p class="hint">Compounds monthly. Contributions are added at the end of each week, 2 weeks, month or year, as chosen. Fees (e.g. a fund's expense ratio or an advisor's charge) come out of your return. The S&amp;P 500 has averaged about 10% a year over the long run (roughly 7% after inflation), but past returns don't guarantee future ones.</p>
+        <button type="button" class="btn" data-reset="investment">Reset to defaults</button>
+      </form>
+      <div class="results">
+        <div class="tiles" id="inv-tiles"></div>
+        <div class="panel"><h3>Growth over time</h3><div class="chart" id="inv-chart"></div></div>
+        <div class="panel"><h3>What if returns are higher or lower?</h3><div class="chart" id="inv-scenarios"></div></div>
+        <details class="panel"><summary>Year-by-year table</summary><div class="table-wrap" id="inv-table"></div></details>
+      </div>
+    </section>
+
+    <!-- ============ RETIREMENT ============ -->
+    <section id="retirement" class="calc" role="tabpanel">
+      <form class="panel inputs" onsubmit="return false">
+        <h2>Roth IRA &amp; retirement</h2>
+        <div class="row2">
+          <label class="field">Current age
+            <div class="input"><input id="ret-age" type="number" min="16" max="90" value="42"></div>
+          </label>
+          <label class="field">Retirement age
+            <div class="input"><input id="ret-retire-age" type="number" min="30" max="100" value="67"></div>
+          </label>
+        </div>
+        <div class="row2">
+          <label class="field">Annual return
+            <div class="input"><input id="ret-rate" type="number" step="0.1" value="7"><span class="suf">%</span></div>
+          </label>
+          <label class="field">Raise contribution yearly
+            <div class="input"><input id="ret-increase" type="number" min="0" step="0.5" value="0"><span class="suf">%</span></div>
+          </label>
+        </div>
+        <div class="row2">
+          <label class="field">Tax rate now
+            <div class="input"><input id="ret-tax-now" type="number" min="0" max="60" step="1" value="17"><span class="suf">%</span></div>
+          </label>
+          <label class="field">Tax rate in retirement
+            <div class="input"><input id="ret-tax-later" type="number" min="0" max="60" step="1" value="12"><span class="suf">%</span></div>
+          </label>
+        </div>
+        <div class="row2">
+          <label class="field">Capital gains tax
+            <div class="input"><input id="ret-cg" type="number" min="0" max="40" step="1" value="15"><span class="suf">%</span></div>
+          </label>
+          <label class="field">Withdrawal rate
+            <div class="input"><input id="ret-withdraw" type="number" min="1" max="10" step="0.1" value="4"><span class="suf">%</span></div>
+          </label>
+        </div>
+        <div class="note" id="ret-limit-note"></div>
+        <button type="button" class="btn" data-reset="retirement retirement-accounts">Reset to defaults</button>
+      </form>
+      <div class="results">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Your accounts</h3>
+            <button type="button" class="btn primary" id="ret-add">+ Add account</button>
+          </div>
+          <div class="exp-head ret-row" aria-hidden="true"><span>Account</span><span>Balance now</span><span>You add / yr</span><span>Employer / yr</span><span></span></div>
+          <div id="ret-accounts" class="exp-list"></div>
+          <div class="exp-empty" id="ret-accounts-empty">No accounts yet. Add each retirement account you have, like a Roth IRA and a 401(k).</div>
+        </div>
+        <div class="tiles" id="ret-tiles"></div>
+        <div class="panel"><h3>Account balance by age</h3><div class="chart" id="ret-chart"></div></div>
+        <div class="panel">
+          <h3>Roth vs. Traditional vs. taxable brokerage (after taxes)</h3>
+          <p class="hint">All your accounts' balances and yearly contributions, as if they were in one kind of account. Traditional is taxed when you withdraw, at your retirement tax rate. In a taxable brokerage, gains are taxed at the capital gains rate when you sell.</p>
+          <div class="chart" id="ret-compare"></div>
+        </div>
+        <details class="panel"><summary>Year-by-year table</summary><div class="table-wrap" id="ret-table"></div></details>
+      </div>
+    </section>
+
+    <!-- ============ MORTGAGE ============ -->
+    <section id="mortgage" class="calc" role="tabpanel">
+      <form class="panel inputs" onsubmit="return false">
+        <h2>Mortgage</h2>
+        <label class="field">This mortgage is
+          <div class="input">
+            <select id="mtg-status">
+              <option value="active">Mine (I'm paying it)</option>
+              <option value="paidoff">Paid off (I own the home)</option>
+              <option value="planning">Just exploring (not mine yet)</option>
+            </select>
+          </div>
+          <span class="hint" id="mtg-status-hint"></span>
+        </label>
+        <label class="field">Home price
+          <div class="input"><span class="pre">$</span><input id="mtg-price" type="number" min="0" step="1000"></div>
+        </label>
+        <div class="row2">
+          <label class="field">Down payment
+            <div class="input"><span class="pre">$</span><input id="mtg-down-amt" type="number" min="0" step="1000"></div>
+          </label>
+          <label class="field">&nbsp;
+            <div class="input"><input id="mtg-down-pct" type="number" min="0" max="100" step="0.5" value="20"><span class="suf">%</span></div>
+          </label>
+        </div>
+        <div class="row2">
+          <label class="field">Interest rate
+            <div class="input"><input id="mtg-rate" type="number" min="0" step="0.05" value="7.3"><span class="suf">%</span></div>
+          </label>
+          <label class="field">Loan term
+            <div class="input">
+              <select id="mtg-term">
+                <option value="30">30 years</option>
+                <option value="20">20 years</option>
+                <option value="15">15 years</option>
+                <option value="10">10 years</option>
+              </select>
+            </div>
+          </label>
+        </div>
+        <label class="field">First payment
+          <div class="input"><input id="mtg-start" type="month"></div>
+          <span class="hint" id="mtg-start-hint"></span>
+        </label>
+        <div class="row2">
+          <label class="field">Property tax / yr
+            <div class="input"><input id="mtg-tax-pct" type="number" min="0" step="0.05" value="1.65"><span class="suf">%</span></div>
+          </label>
+          <label class="field">Home insurance / yr
+            <div class="input"><span class="pre">$</span><input id="mtg-ins" type="number" min="0" step="50"></div>
+          </label>
+        </div>
+        <div class="row2">
+          <label class="field">PMI rate / yr
+            <div class="input"><input id="mtg-pmi" type="number" min="0" step="0.05" value="0.5"><span class="suf">%</span></div>
+          </label>
+          <label class="field">HOA / month
+            <div class="input"><span class="pre">$</span><input id="mtg-hoa" type="number" min="0" step="10"></div>
+          </label>
+        </div>
+        <label class="field">Extra payment / month
+          <div class="input"><span class="pre">$</span><input id="mtg-extra" type="number" min="0" step="50"></div>
+        </label>
+        <p class="hint">PMI only applies when you put down less than 20%. It drops off once the balance reaches 78% of the home price.</p>
+        <button type="button" class="btn" data-reset="mortgage">Reset to defaults</button>
+      </form>
+      <div class="results">
+        <div class="tiles" id="mtg-tiles"></div>
+        <div class="two-col">
+          <div class="panel"><h3>Monthly payment breakdown</h3><div class="chart" id="mtg-donut"></div></div>
+          <div class="panel"><h3>Loan balance &amp; what you've paid</h3><div class="chart" id="mtg-chart"></div></div>
+        </div>
+        <details class="panel">
+          <summary>Amortization schedule</summary>
+          <div class="table-controls">
+            <label class="field inline">Show
+              <div class="input"><select id="mtg-table-mode"><option value="year">By year</option><option value="month">By month</option></select></div>
+            </label>
+          </div>
+          <div class="table-wrap" id="mtg-table"></div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ============ AUTO LOAN ============ -->
+    <section id="auto" class="calc" role="tabpanel">
+      <form class="panel inputs" onsubmit="return false">
+        <h2>Auto loan</h2>
+        <label class="field">This car loan is
+          <div class="input">
+            <select id="auto-status">
+              <option value="active">Mine (I'm paying it)</option>
+              <option value="paidoff">Paid off (I own the car)</option>
+              <option value="planning">Just exploring (not mine yet)</option>
+            </select>
+          </div>
+          <span class="hint" id="auto-status-hint"></span>
+        </label>
+        <label class="field">Vehicle price
+          <div class="input"><span class="pre">$</span><input id="auto-price" type="number" min="0" step="500"></div>
+        </label>
+        <label class="field">Down payment
+          <div class="input"><span class="pre">$</span><input id="auto-down" type="number" min="0" step="500"></div>
+        </label>
+        <div class="row2">
+          <label class="field">Trade-in value
+            <div class="input"><span class="pre">$</span><input id="auto-trade" type="number" min="0" step="500"></div>
+          </label>
+          <label class="field">Owed on trade-in
+            <div class="input"><span class="pre">$</span><input id="auto-owed" type="number" min="0" step="500"></div>
+          </label>
+        </div>
+        <div class="row2">
+          <label class="field">Interest rate
+            <div class="input"><input id="auto-rate" type="number" min="0" step="0.1" value="7"><span class="suf">%</span></div>
+          </label>
+          <label class="field">Loan term
+            <div class="input">
+              <select id="auto-term">
+                <option value="36">36 months</option>
+                <option value="48">48 months</option>
+                <option value="60">60 months</option>
+                <option value="72" selected>72 months</option>
+                <option value="84">84 months</option>
+              </select>
+            </div>
+          </label>
+        </div>
+        <div class="row2">
+          <label class="field">First payment
+            <div class="input"><input id="auto-start" type="month"></div>
+          </label>
+          <label class="field">Car's value now
+            <div class="input"><span class="pre">$</span><input id="auto-value" type="number" min="0" step="500"></div>
+          </label>
+        </div>
+        <p class="hint" id="auto-now-hint"></p>
+        <div class="row2">
+          <label class="field">Sales tax
+            <div class="input"><input id="auto-tax" type="number" min="0" step="0.125" value="8.625"><span class="suf">%</span></div>
+          </label>
+          <label class="field">Title, registration &amp; fees
+            <div class="input"><span class="pre">$</span><input id="auto-fees" type="number" min="0" step="50"></div>
+          </label>
+        </div>
+        <label class="check"><input id="auto-include" type="checkbox" checked> Roll taxes &amp; fees into the loan</label>
+        <p class="hint">Sales tax is calculated on the price minus your trade-in, which is how most states do it.</p>
+        <button type="button" class="btn" data-reset="auto">Reset to defaults</button>
+      </form>
+      <div class="results">
+        <div class="tiles" id="auto-tiles"></div>
+        <div class="two-col">
+          <div class="panel"><h3>Total of loan payments</h3><div class="chart" id="auto-donut"></div></div>
+          <div class="panel"><h3>Total interest by loan term</h3><div class="chart" id="auto-terms"></div></div>
+        </div>
+        <div class="panel"><h3>Compare loan terms</h3><div class="table-wrap" id="auto-table"></div></div>
+      </div>
+    </section>
+
+    <!-- ============ BUDGET ============ -->
+    <section id="budget" class="calc" role="tabpanel">
+      <form class="panel inputs" onsubmit="return false">
+        <h2>Budget planner</h2>
+        <label class="field">Income
+          <div class="input"><span class="pre">$</span><input id="bud-income" type="number" min="0" step="100"></div>
+        </label>
+        <div class="row2">
+          <label class="field">Paid
+            <div class="input">
+              <select id="bud-freq">
+                <option value="year">Per year</option>
+                <option value="month">Per month</option>
+                <option value="biweekly">Every 2 weeks</option>
+                <option value="week">Per week</option>
+              </select>
+            </div>
+          </label>
+          <label class="field">Amount is
+            <div class="input">
+              <select id="bud-type">
+                <option value="gross">Before taxes</option>
+                <option value="net">Take-home</option>
+              </select>
+            </div>
+          </label>
+        </div>
+        <label class="field" id="bud-tax-field">Taxes &amp; deductions
+          <div class="input"><input id="bud-tax" type="number" min="0" max="70" step="1" value="30"><span class="suf">%</span></div>
+          <span class="hint">Federal, state, FICA, and any health insurance or 401(k) taken out of your check. 20–30% is typical.</span>
+        </label>
+        <label class="field">Budget rule
+          <div class="input">
+            <select id="bud-rule">
+              <option value="50-30-20">50 / 30 / 20 (needs / wants / savings)</option>
+              <option value="60-20-20" selected>60 / 20 / 20 (high cost of living)</option>
+              <option value="70-20-10">70 / 20 / 10 (tight budget)</option>
+              <option value="40-20-40">40 / 20 / 40 (aggressive saver)</option>
+            </select>
+          </div>
+        </label>
+        <p class="hint"><b>Needs:</b> rent, utilities, groceries, insurance, minimum debt payments, transportation.<br><b>Wants:</b> dining out, entertainment, subscriptions, travel.<br><b>Savings &amp; debt:</b> emergency fund, Roth IRA, investing, extra debt payments.</p>
+        <button type="button" class="btn" data-reset="budget budget-expenses income-streams">Reset to defaults</button>
+      </form>
+      <div class="results">
+        <div class="tiles" id="bud-tiles"></div>
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Other income</h3>
+            <button type="button" class="btn primary" id="bud-add-stream">+ Add income</button>
+          </div>
+          <div id="bud-streams" class="exp-list"></div>
+          <div class="exp-empty" id="bud-streams-empty">No other income. Add a side gig, second job, rental income or anything else that pays you.</div>
+          <p class="hint" id="bud-streams-hint"></p>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Your expenses</h3>
+            <button type="button" class="btn primary" id="bud-add">+ Add expense</button>
+          </div>
+          <div class="exp-head" aria-hidden="true"><span>Name</span><span>Amount</span><span>How often</span><span>Category</span><span></span></div>
+          <div id="bud-expenses" class="exp-list"></div>
+        </div>
+        <div class="two-col">
+          <div class="panel"><h3>Recommended vs. your spending</h3><div class="chart" id="bud-bars"></div></div>
+          <div class="panel"><h3>Where your take-home pay goes</h3><div class="chart" id="bud-donut"></div></div>
+        </div>
+        <div class="panel"><h3>Category breakdown (per month)</h3><div class="table-wrap" id="bud-table"></div></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>Your inputs are saved in this browser automatically. These are estimates for planning, not financial advice.</span>
+    <span class="footer-actions">
+      <button type="button" class="btn" id="reset-all-btn">Reset all tabs</button>
+      <button type="button" class="btn" id="export-btn">Export backup</button>
+      <label class="btn" for="import-input">Import backup</label>
+      <input type="file" id="import-input" accept="application/json,.json" hidden>
+    </span>
+  </footer>
+
+  <script src="js/util.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/income.js"></script>
+  <script src="js/investment.js"></script>
+  <script src="js/retirement.js"></script>
+  <script src="js/mortgage.js"></script>
+  <script src="js/autoloan.js"></script>
+  <script src="js/budget.js"></script>
+  <script src="js/salary.js"></script>
+  <script src="js/networth.js"></script>
+  <script src="js/overview.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
