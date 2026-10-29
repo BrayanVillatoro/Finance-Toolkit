@@ -136,6 +136,13 @@ main { padding-top: 20px; padding-bottom: 32px; }
 }
 .calc[hidden] { display: none; }
 .calc.wide { grid-template-columns: minmax(0, 1fr); }
+/* A tab holding several calculators stacks them as rows; each keeps its sticky form to its own row. */
+.calc-row {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
 
 /* ---------- Overview checklist ---------- */
 .ov-checks { list-style: none; margin: 0; padding: 0; }
@@ -421,6 +428,6 @@ td.tone-critical { color: var(--critical-text); }
   .two-col { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 900px) {
-  .calc { grid-template-columns: minmax(0, 1fr); }
+  .calc, .calc-row { grid-template-columns: minmax(0, 1fr); }
   .inputs { position: static; }
 }

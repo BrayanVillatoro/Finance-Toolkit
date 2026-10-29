@@ -1,6 +1,6 @@
 /* Investment growth calculator */
 (function (FT) {
-  const root = document.getElementById('investment');
+  const root = document.getElementById('inv-growth');
   const C = FT.colors;
   const Y0 = new Date().getFullYear();
 

@@ -138,7 +138,8 @@
     </section>
 
     <!-- ============ INVESTMENT ============ -->
-    <section id="investment" class="calc" role="tabpanel">
+    <section id="investment" class="calc wide" role="tabpanel">
+      <div class="calc-row" id="inv-growth">
       <form class="panel inputs" onsubmit="return false">
         <h2>Investment growth</h2>
         <label class="field">Starting amount
@@ -183,6 +184,40 @@
         <div class="panel"><h3>Growth over time</h3><div class="chart" id="inv-chart"></div></div>
         <div class="panel"><h3>What if returns are higher or lower?</h3><div class="chart" id="inv-scenarios"></div></div>
         <details class="panel"><summary>Year-by-year table</summary><div class="table-wrap" id="inv-table"></div></details>
+      </div>
+      </div>
+
+      <div class="calc-row" id="inv-stock">
+      <form class="panel inputs" onsubmit="return false">
+        <h2>Stock profit</h2>
+        <label class="field">Amount bought
+          <div class="input">
+            <input id="stk-qty" type="number" min="0" step="any" value="10">
+            <select id="stk-qty-type" aria-label="Amount is in shares or dollars">
+              <option value="shares" selected>shares</option>
+              <option value="usd">dollars</option>
+            </select>
+          </div>
+          <span class="hint" id="stk-qty-hint"></span>
+        </label>
+        <div class="row2">
+          <label class="field">Buy price
+            <div class="input"><span class="pre">$</span><input id="stk-buy" type="number" min="0" step="0.01" value="150"></div>
+          </label>
+          <label class="field">Sell price
+            <div class="input"><span class="pre">$</span><input id="stk-sell" type="number" min="0" step="0.01" value="200"></div>
+          </label>
+        </div>
+        <label class="field">Fees (buy + sell)
+          <div class="input"><span class="pre">$</span><input id="stk-fees" type="number" min="0" step="0.01" value="0"></div>
+        </label>
+        <p class="hint">Prices are per share. This is a what-if calculator only: it doesn't count toward your Overview or Net worth.</p>
+        <button type="button" class="btn" data-reset="stock">Reset to defaults</button>
+      </form>
+      <div class="results">
+        <div class="tiles" id="stk-tiles"></div>
+        <div class="panel"><h3>Profit at other sell prices</h3><div class="table-wrap" id="stk-table"></div></div>
+      </div>
       </div>
     </section>
 
@@ -491,6 +526,7 @@
   <script src="js/charts.js"></script>
   <script src="js/income.js"></script>
   <script src="js/investment.js"></script>
+  <script src="js/stock.js"></script>
   <script src="js/retirement.js"></script>
   <script src="js/mortgage.js"></script>
   <script src="js/autoloan.js"></script>
