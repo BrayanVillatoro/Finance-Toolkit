@@ -29,12 +29,12 @@ That's it. Your numbers save automatically as you type.
 | **Salary & taxes** | Take-home pay from your salary using 2026 federal brackets, Social Security, Medicare and state tax. Handles 401(k) and HSA deductions and extra income (second job, side gig with self-employment tax, rental). |
 | **Budget** | Plan income against expenses with a 50/30/20-style rule. Extra income streams are shared with the Salary tab. |
 | **Net worth** | What you own minus what you owe. Pulls in your home, car, loans and account balances from the other tabs; add cash, other vehicles and debts yourself. |
-| **Investment** | Growth of regular contributions (weekly, every 2 weeks, monthly or yearly), with fees, inflation and higher or lower return scenarios. |
+| **Investment** | Growth of regular contributions (weekly, every 2 weeks, monthly or yearly), with fees, inflation and higher or lower return scenarios. Also a **stock profit** calculator: enter shares (or dollars) with a buy and sell price to see your profit or loss, return, break-even price and what you'd make at other sell prices. It's just for trying numbers and doesn't count toward your Overview or Net worth. |
 | **Roth IRA & retirement** | Add every retirement account you have (for example a Roth IRA and a 401(k)) and see them grow together. Compares Roth vs. Traditional vs. a taxable account, with 2026 contribution limits and employer match. |
 | **Mortgage** | Monthly payment including taxes, insurance and PMI, extra payments, the amortization schedule, and today's balance from your first payment date. |
 | **Auto loan** | Payment, total interest, comparison of loan terms, today's balance, and your car's estimated current value. |
 
-Mortgages and car loans can be marked **Mine**, **Paid off** or **Just exploring**, so you can try out numbers without them counting toward your Overview.
+Mortgages and car loans can be marked **Mine**, **Paid off** or **Just exploring**, so you can try out numbers without them counting toward your Overview. The stock profit calculator never counts toward it.
 
 ## Screenshots
 
